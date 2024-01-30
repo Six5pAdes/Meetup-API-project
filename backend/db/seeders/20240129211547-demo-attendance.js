@@ -53,10 +53,10 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    options.tableName = "Attendance";
+    options.tableName = "Attendances";
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
-      username: {
+      status: {
         [Op.in]: ["attending", "pending", "waitlist"],
       },
     });

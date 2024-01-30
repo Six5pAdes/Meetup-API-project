@@ -51,7 +51,7 @@ module.exports = {
           name: "Party Y",
           description:
             "Consulted up my tolerably sometimes perpetual oh. Expression acceptance imprudence particular had eat unsatiable.",
-          type: "Online",
+          type: "In person",
           capacity: 5,
           price: 17,
           startDate: "2024/07/07 04:54:49",
@@ -63,7 +63,7 @@ module.exports = {
           name: "Party Z",
           description:
             "Scarcely on striking packages by so property in delicate. Up or well must less rent read walk so be. Easy sold at do hour sing spot.",
-          type: "Online",
+          type: "In person",
           capacity: 4,
           price: 17,
           startDate: "2024/07/06 09:29:19",
@@ -84,7 +84,7 @@ module.exports = {
     options.tableName = "Events";
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
-      username: { [Op.substring]: ["Party"] },
+      name: { [Op.substring]: ["Party"] },
     });
   },
 };

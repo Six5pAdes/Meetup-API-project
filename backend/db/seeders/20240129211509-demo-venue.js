@@ -26,7 +26,7 @@ module.exports = {
           address: "West Street",
           city: "Honolulu",
           state: "Hawaii",
-          lat: 99,
+          lat: 89,
           lng: 21,
         },
         {
@@ -34,7 +34,7 @@ module.exports = {
           address: "North Street",
           city: "Cincinnati",
           state: "Ohio",
-          lat: -175,
+          lat: -5,
           lng: 32,
         },
         {
@@ -50,7 +50,7 @@ module.exports = {
           address: "South Street",
           city: "Albuquerque",
           state: "New Mexico",
-          lat: 172,
+          lat: 17,
           lng: -26,
         },
       ],
@@ -68,7 +68,7 @@ module.exports = {
     options.tableName = "Venues";
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
-      username: { [Op.substring]: ["Street"] },
+      address: { [Op.substring]: ["Street"] },
     });
   },
 };

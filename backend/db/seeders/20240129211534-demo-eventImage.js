@@ -38,7 +38,7 @@ module.exports = {
         },
         {
           eventId: 4,
-          url: "imgUrl 7",
+          url: "imgUrl 8",
           preview: true,
         },
       ],
@@ -56,7 +56,7 @@ module.exports = {
     options.tableName = "EventImages";
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
-      username: { [Op.substring]: ["imgUrl"] },
+      url: { [Op.substring]: ["imgUrl"] },
     });
   },
 };
