@@ -9,24 +9,21 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Event.belongsToMany(models.User, {
-        through: models.Attendance,
-        foreignKey: "eventId",
-        otherKey: "userId",
-      });
-
       Event.hasMany(models.EventImage, {
         foreignKey: "eventId",
         onDelete: "CASCADE",
         hooks: true,
       });
-
-      Event.belongsTo(models.Group, {
-        foreignKey: "groupId",
+      Event.hasMany(models.Attendance, {
+        foreignKey: "eventId",
+        onDelete: "CASCADE",
+        hooks: true,
       });
       Event.belongsTo(models.Venue, {
         foreignKey: "venueId",
-        onDelete: "SET NULL",
+      });
+      Event.belongsTo(models.Group, {
+        foreignKey: "groupId",
       });
     }
   }
@@ -34,9 +31,21 @@ module.exports = (sequelize, DataTypes) => {
     {
       venueId: DataTypes.INTEGER,
       groupId: DataTypes.INTEGER,
-      name: { type: DataTypes.STRING, allowNull: false },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          len: [5, 60],
+        },
+      },
       description: DataTypes.TEXT,
-      type: { type: DataTypes.STRING, allowNull: false },
+      type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isIn: [["Online", "In person"]],
+        },
+      },
       capacity: DataTypes.INTEGER,
       price: DataTypes.INTEGER,
       startDate: { type: DataTypes.DATE, allowNull: false },

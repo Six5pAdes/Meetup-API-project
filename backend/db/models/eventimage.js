@@ -18,7 +18,11 @@ module.exports = (sequelize, DataTypes) => {
     {
       eventId: DataTypes.INTEGER,
       url: DataTypes.STRING,
-      preview: { type: DataTypes.BOOLEAN, allowNull: false },
+      preview: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       sequelize,

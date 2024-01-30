@@ -9,13 +9,25 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Attendance.belongsTo(models.Event, {
+        foreignKey: "eventId",
+      });
+      Attendance.belongsTo(models.User, {
+        foreignKey: "userId",
+      });
     }
   }
   Attendance.init(
     {
       eventId: DataTypes.INTEGER,
       userId: DataTypes.INTEGER,
-      status: { type: DataTypes.STRING, allowNull: false },
+      status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isIn: [["attending", "pending", "waitlist"]],
+        },
+      },
     },
     {
       sequelize,

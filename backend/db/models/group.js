@@ -9,20 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Group.belongsToMany(models.User, {
-        through: models.Membership,
-        foreignKey: "groupId",
-        otherKey: "UserId",
-      });
-      Group.belongsTo(models.User, {
-        foreignKey: "organizerId",
-      });
-      Group.belongsToMany(models.Venue, {
-        through: models.Event,
-        foreignKey: "groupId",
-        otherKey: "venueId",
-      });
-      Group.hasMany(models.Venue, {
+      Group.hasMany(models.Event, {
         foreignKey: "groupId",
         onDelete: "CASCADE",
         hooks: true,
@@ -32,19 +19,46 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         hooks: true,
       });
-      Group.hasMany(models.Event, {
+      Group.hasMany(models.Membership, {
         foreignKey: "groupId",
         onDelete: "CASCADE",
         hooks: true,
+      });
+      Group.hasMany(models.Venue, {
+        foreignKey: "groupId",
+        onDelete: "CASCADE",
+        hooks: true,
+      });
+      Group.belongsTo(models.User, {
+        foreignKey: "organizerId",
+        as: "Organizer",
       });
     }
   }
   Group.init(
     {
       organizerId: DataTypes.INTEGER,
-      name: { type: DataTypes.STRING, allowNull: false },
-      about: { type: DataTypes.TEXT, allowNull: false },
-      type: { type: DataTypes.STRING, allowNull: false },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          len: [2, 60],
+        },
+      },
+      about: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        validate: {
+          len: [50, 255],
+        },
+      },
+      type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isIn: [["Online", "In person"]],
+        },
+      },
       private: { type: DataTypes.BOOLEAN, allowNull: false },
       city: DataTypes.STRING,
       state: DataTypes.STRING,

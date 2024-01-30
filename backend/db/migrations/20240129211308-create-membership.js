@@ -4,11 +4,12 @@ let options = {};
 if (process.env.NODE_ENV === "production") {
   options.schema = process.env.SCHEMA;
 }
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable(
-      "Groups",
+      "Memberships",
       {
         id: {
           allowNull: false,
@@ -16,35 +17,27 @@ module.exports = {
           primaryKey: true,
           type: Sequelize.INTEGER,
         },
-        organizerId: {
+        userId: {
           type: Sequelize.INTEGER,
           references: {
             model: "Users",
             key: "id",
           },
           onDelete: "CASCADE",
+          hooks: true,
         },
-        name: {
+        groupId: {
+          type: Sequelize.INTEGER,
+          references: {
+            model: "Groups",
+            key: "id",
+          },
+          onDelete: "CASCADE",
+          hooks: true,
+        },
+        status: {
           type: Sequelize.STRING,
           allowNull: false,
-        },
-        about: {
-          type: Sequelize.TEXT,
-          allowNull: false,
-        },
-        type: {
-          type: Sequelize.STRING,
-          allowNull: false,
-        },
-        private: {
-          type: Sequelize.BOOLEAN,
-          allowNull: false,
-        },
-        city: {
-          type: Sequelize.STRING,
-        },
-        state: {
-          type: Sequelize.STRING,
         },
         createdAt: {
           allowNull: false,
@@ -61,7 +54,7 @@ module.exports = {
     );
   },
   async down(queryInterface, Sequelize) {
-    options.tableName = "Groups";
+    options.tableName = "Memberships";
     return queryInterface.dropTable(options);
   },
 };

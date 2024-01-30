@@ -1,14 +1,14 @@
 "use strict";
-
 let options = {};
 if (process.env.NODE_ENV === "production") {
   options.schema = process.env.SCHEMA;
 }
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable(
-      "Memberships",
+      "EventImages",
       {
         id: {
           allowNull: false,
@@ -16,25 +16,22 @@ module.exports = {
           primaryKey: true,
           type: Sequelize.INTEGER,
         },
-        userId: {
+        eventId: {
           type: Sequelize.INTEGER,
           references: {
-            model: "Users",
+            model: "Events",
             key: "id",
           },
           onDelete: "CASCADE",
+          hooks: true,
         },
-        groupId: {
-          type: Sequelize.INTEGER,
-          references: {
-            model: "Groups",
-            key: "id",
-          },
-          onDelete: "CASCADE",
-        },
-        status: {
+        url: {
           type: Sequelize.STRING,
+        },
+        preview: {
+          type: Sequelize.BOOLEAN,
           allowNull: false,
+          defaultValue: false,
         },
         createdAt: {
           allowNull: false,
@@ -51,7 +48,7 @@ module.exports = {
     );
   },
   async down(queryInterface, Sequelize) {
-    options.tableName = "Memberships";
+    options.tableName = "EventImages";
     return queryInterface.dropTable(options);
   },
 };
