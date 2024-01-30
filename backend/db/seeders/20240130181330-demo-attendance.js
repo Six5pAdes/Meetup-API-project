@@ -1,6 +1,6 @@
 "use strict";
 
-const { GroupImage } = require("../models");
+const { Attendance } = require("../models");
 
 let options = {};
 if (process.env.NODE_ENV === "production") {
@@ -19,31 +19,28 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    await GroupImage.bulkCreate(
-      [
-        {
-          groupId: 1,
-          url: "imgUrl 1",
-          preview: false,
-        },
-        {
-          groupId: 2,
-          url: "imgUrl 2",
-          preview: false,
-        },
-        {
-          groupId: 3,
-          url: "imgUrl 3",
-          preview: true,
-        },
-        {
-          groupId: 4,
-          url: "imgUrl 4",
-          preview: true,
-        },
-      ],
-      { validate: true }
-    );
+    await Attendance.bulkCreate([
+      {
+        eventId: 1,
+        userId: 1,
+        status: "attending",
+      },
+      {
+        eventId: 2,
+        userId: 2,
+        status: "pending",
+      },
+      {
+        eventId: 3,
+        userId: 3,
+        status: "waitlist",
+      },
+      {
+        eventId: 4,
+        userId: 4,
+        status: "attending",
+      },
+    ]);
   },
 
   async down(queryInterface, Sequelize) {
@@ -53,10 +50,12 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    options.tableName = "GroupImages";
+    options.tableName = "Attendances";
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
-      url: { [Op.substring]: ["imgUrl"] },
+      status: {
+        [Op.in]: ["attending", "pending", "waitlist"],
+      },
     });
   },
 };

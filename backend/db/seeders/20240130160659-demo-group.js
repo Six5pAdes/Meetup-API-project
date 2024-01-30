@@ -23,43 +23,43 @@ module.exports = {
       [
         {
           organizerId: 1,
-          name: "Posse One",
+          name: "Posse 1",
           about:
-            "Lorem ipsum dolor sit amet. Ea saepe rerum et vero enim eos quae optio qui atque architecto est placeat natus nam earum vitae.",
-          type: "Online",
+            "Ignorant branched humanity led now marianne too strongly entrance. Remark fat set why are sudden depend change entire wanted.",
+          type: "In person",
           private: true,
-          city: "Honolulu",
-          state: "Hawaii",
+          city: "Anaheim",
+          state: "California",
         },
         {
           organizerId: 2,
-          name: "Posse Two",
+          name: "Posse 2",
           about:
-            "Et culpa omnis aut quae sint non consequatur temporibus aut deleniti eveniet aut totam sint et amet magni id obcaecati quia.",
-          type: "In person",
+            "Rose to shew bore no ye of paid rent form. Old design are dinner better nearer silent excuse.",
+          type: "Online",
           private: true,
-          city: "Cincinnati",
-          state: "Ohio",
+          city: "Laredo",
+          state: "Texas",
         },
         {
           organizerId: 3,
-          name: "Posse Three",
+          name: "Posse 3",
           about:
-            "In repellendus repudiandae eum beatae quos sed quidem obcaecati et asperiores aliquid.",
-          type: "Online",
+            "She which are maids boy sense her shade. Considered reasonable we affronting on expression in.",
+          type: "In person",
           private: false,
-          city: "North Hempstead",
-          state: "New York",
+          city: "St Paul",
+          state: "Minnesota",
         },
         {
           organizerId: 4,
-          name: "Posse Four",
+          name: "Posse 4",
           about:
-            "Et dignissimos reiciendis id cumque veritatis ea pariatur distinctio aut optio illum qui incidunt quae!",
-          type: "In person",
+            "So cordial anxious mr delight. Shot his has must wish from sell nay. Yadda yadda yadda",
+          type: "Online",
           private: false,
-          city: "Albuquerque",
-          state: "New Mexico",
+          city: "Buffalo",
+          state: "New York",
         },
       ],
       { validate: true }
@@ -76,7 +76,9 @@ module.exports = {
     options.tableName = "Groups";
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
-      name: { [Op.substring]: ["Posse"] },
+      name: {
+        [Op.substring]: ["Posse"],
+      },
     });
   },
 };

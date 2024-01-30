@@ -24,34 +24,34 @@ module.exports = {
         {
           groupId: 1,
           address: "West Street",
-          city: "Honolulu",
-          state: "Hawaii",
-          lat: 89,
-          lng: 21,
+          city: "Anaheim",
+          state: "California",
+          lat: -75,
+          lng: 146,
         },
         {
           groupId: 2,
-          address: "North Street",
-          city: "Cincinnati",
-          state: "Ohio",
-          lat: -5,
-          lng: 32,
+          address: "South Street",
+          city: "Laredo",
+          state: "Texas",
+          lat: -33,
+          lng: 58,
         },
         {
           groupId: 3,
-          address: "East Street",
-          city: "New Hampstead",
-          state: "New York",
-          lat: 90,
-          lng: 148,
+          address: "North Street",
+          city: "St Paul",
+          state: "Minnesota",
+          lat: 2,
+          lng: -153,
         },
         {
           groupId: 4,
-          address: "South Street",
-          city: "Albuquerque",
-          state: "New Mexico",
-          lat: 17,
-          lng: -26,
+          address: "East Street",
+          city: "Buffalo",
+          state: "New York",
+          lat: -31,
+          lng: 129,
         },
       ],
       { validate: true }
@@ -68,7 +68,9 @@ module.exports = {
     options.tableName = "Venues";
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
-      address: { [Op.substring]: ["Street"] },
+      address: {
+        [Op.substring]: ["Street"],
+      },
     });
   },
 };

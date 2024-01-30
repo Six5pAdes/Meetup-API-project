@@ -26,48 +26,48 @@ module.exports = {
           groupId: 1,
           name: "Party W",
           description:
-            "Out interested acceptance our partiality affronting unpleasant why add. Esteem garden men yet shy course.",
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
           type: "Online",
-          capacity: 10,
-          price: 17,
-          startDate: "2024/10/08 04:47:07",
-          endDate: "2024/11/08 04:49:27",
+          capacity: 13,
+          price: 34,
+          startDate: "2024/04/09 10:10:09",
+          endDate: "2024/11/01 00:36:27",
         },
         {
           venueId: 2,
           groupId: 2,
           name: "Party X",
           description:
-            "In it except to so temper mutual tastes mother. Interested cultivated its continuing now yet are.",
+            "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
           type: "Online",
-          capacity: 6,
-          price: 17,
-          startDate: "2024/01/04 19:32:41",
-          endDate: "2024/07/22 15:53:15",
+          capacity: 60,
+          price: 50,
+          startDate: "2024/01/28 21:51:01",
+          endDate: "2024/10/17 20:06:31",
         },
         {
           venueId: 3,
           groupId: 3,
           name: "Party Y",
           description:
-            "Consulted up my tolerably sometimes perpetual oh. Expression acceptance imprudence particular had eat unsatiable.",
+            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
           type: "In person",
-          capacity: 5,
-          price: 17,
-          startDate: "2024/07/07 04:54:49",
-          endDate: "2024/07/12 23:00:57",
+          capacity: 47,
+          price: 10,
+          startDate: "2024/08/26 18:35:39",
+          endDate: "2024/11/08 08:46:51",
         },
         {
           venueId: 4,
           groupId: 4,
           name: "Party Z",
           description:
-            "Scarcely on striking packages by so property in delicate. Up or well must less rent read walk so be. Easy sold at do hour sing spot.",
+            "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
           type: "In person",
-          capacity: 4,
-          price: 17,
-          startDate: "2024/07/06 09:29:19",
-          endDate: "2024/11/26 00:53:11",
+          capacity: 38,
+          price: 35,
+          startDate: "2024/07/12 05:10:43",
+          endDate: "2024/08/12 22:06:00",
         },
       ],
       { validate: true }
@@ -84,7 +84,9 @@ module.exports = {
     options.tableName = "Events";
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
-      name: { [Op.substring]: ["Party"] },
+      name: {
+        [Op.substring]: ["Party"],
+      },
     });
   },
 };

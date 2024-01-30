@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         hooks: true,
       });
-      Group.belongsTo(models.Membership, {
+      Group.hasMany(models.Membership, {
         foreignKey: "groupId",
         onDelete: "CASCADE",
         hooks: true,
@@ -56,7 +56,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          isIn: ["Online", "In person"],
+          isIn: [["Online", "In person"]],
         },
       },
       private: { type: DataTypes.BOOLEAN, allowNull: false },

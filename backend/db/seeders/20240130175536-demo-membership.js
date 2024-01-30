@@ -1,6 +1,6 @@
 "use strict";
 
-const { Attendance } = require("../models");
+const { Membership } = require("../models");
 
 let options = {};
 if (process.env.NODE_ENV === "production") {
@@ -19,31 +19,28 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    await Attendance.bulkCreate(
-      [
-        {
-          eventId: 1,
-          userId: 1,
-          status: "attending",
-        },
-        {
-          eventId: 2,
-          userId: 2,
-          status: "pending",
-        },
-        {
-          eventId: 3,
-          userId: 3,
-          status: "waitlist",
-        },
-        {
-          eventId: 4,
-          userId: 4,
-          status: "pending",
-        },
-      ],
-      { validate: true }
-    );
+    await Membership.bulkCreate([
+      {
+        userId: 1,
+        groupId: 1,
+        status: "co-host",
+      },
+      {
+        userId: 2,
+        groupId: 2,
+        status: "organizer",
+      },
+      {
+        userId: 3,
+        groupId: 3,
+        status: "member",
+      },
+      {
+        userId: 4,
+        groupId: 4,
+        status: "pending",
+      },
+    ]);
   },
 
   async down(queryInterface, Sequelize) {
@@ -53,11 +50,11 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    options.tableName = "Attendances";
+    options.tableName = "Memberships";
     const Op = Sequelize.Op;
     return queryInterface.bulkDelete(options, {
       status: {
-        [Op.in]: ["attending", "pending", "waitlist"],
+        [Op.in]: ["co-host", "organizer", "member", "pending"],
       },
     });
   },
