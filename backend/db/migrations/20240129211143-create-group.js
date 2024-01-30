@@ -23,6 +23,8 @@ module.exports = {
             model: "Users",
             key: "id",
           },
+          onDelete: "CASCADE",
+          hooks: true,
         },
         name: {
           type: Sequelize.STRING,

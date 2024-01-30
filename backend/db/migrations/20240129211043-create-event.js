@@ -23,6 +23,8 @@ module.exports = {
             model: "Venues",
             key: "id",
           },
+          onDelete: "CASCADE",
+          hooks: true,
         },
         groupId: {
           type: Sequelize.INTEGER,
@@ -30,6 +32,8 @@ module.exports = {
             model: "Groups",
             key: "id",
           },
+          onDelete: "CASCADE",
+          hooks: true,
         },
         name: {
           type: Sequelize.STRING,

@@ -23,6 +23,8 @@ module.exports = {
             model: "Events",
             key: "id",
           },
+          onDelete: "CASCADE",
+          hooks: true,
         },
         userId: {
           type: Sequelize.INTEGER,
@@ -30,6 +32,8 @@ module.exports = {
             model: "Users",
             key: "id",
           },
+          onDelete: "CASCADE",
+          hooks: true,
         },
         status: {
           type: Sequelize.STRING,
