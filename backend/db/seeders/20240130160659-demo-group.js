@@ -61,7 +61,7 @@ module.exports = {
           city: "Buffalo",
           state: "New York",
         },
-      ],
+      ], options,
       { validate: true }
     );
   },

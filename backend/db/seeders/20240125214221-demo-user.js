@@ -51,6 +51,7 @@ module.exports = {
           hashedPassword: bcrypt.hashSync("password4"),
         },
       ],
+      options,
       { validate: true }
     );
   },

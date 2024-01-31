@@ -69,7 +69,7 @@ module.exports = {
           startDate: "2024/07/12 05:10:43",
           endDate: "2024/08/12 22:06:00",
         },
-      ],
+      ], options,
       { validate: true }
     );
   },
