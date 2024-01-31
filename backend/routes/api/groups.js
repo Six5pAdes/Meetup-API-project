@@ -94,14 +94,33 @@ router.post("/", requireAuth, validateGroup, async (req, res) => {
 // require authentication
 // require [proper] authorization
 router.put("/:groupId", requireAuth, async (req, res) => {
-  res.json();
+  const { name, about, type, private, city, state } = req.body;
+
+  const editGroup = await Group.findByPk();
+
+  if (!editGroup) {
+    res.status(404).message({
+      message: "Group couldn't be found",
+    });
+  }
+
+  await editGroup.save();
+  res.json(editGroup);
 });
 
 // 12. delete group
 // require authentication
 // require [proper] authorization
 router.delete("/:groupId", requireAuth, async (req, res) => {
-  res.json();
+  const destroyGroup = await Group.findByPk(req.params.groupId);
+
+  if (!destroyGroup) {
+    res.status(404).message({
+      message: "Group couldn't be found",
+    });
+  }
+  await destroyGroup.destroy();
+  res.json({ message: "Successfully deleted" });
 });
 
 // 10. add image to group based on group id
