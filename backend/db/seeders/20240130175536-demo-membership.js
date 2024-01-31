@@ -19,28 +19,32 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    await Membership.bulkCreate([
-      {
-        userId: 1,
-        groupId: 1,
-        status: "co-host",
-      },
-      {
-        userId: 2,
-        groupId: 2,
-        status: "organizer",
-      },
-      {
-        userId: 3,
-        groupId: 3,
-        status: "member",
-      },
-      {
-        userId: 4,
-        groupId: 4,
-        status: "pending",
-      },
-    ]);
+    await Membership.bulkCreate(
+      [
+        {
+          userId: 1,
+          groupId: 1,
+          status: "co-host",
+        },
+        {
+          userId: 2,
+          groupId: 2,
+          status: "organizer",
+        },
+        {
+          userId: 3,
+          groupId: 3,
+          status: "member",
+        },
+        {
+          userId: 4,
+          groupId: 4,
+          status: "pending",
+        },
+      ],
+      options,
+      { validate: true }
+    );
   },
 
   async down(queryInterface, Sequelize) {

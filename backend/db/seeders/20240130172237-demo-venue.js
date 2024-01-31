@@ -54,6 +54,7 @@ module.exports = {
           lng: 129,
         },
       ],
+      options,
       { validate: true }
     );
   },

@@ -19,28 +19,32 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    await Attendance.bulkCreate([
-      {
-        eventId: 1,
-        userId: 1,
-        status: "attending",
-      },
-      {
-        eventId: 2,
-        userId: 2,
-        status: "pending",
-      },
-      {
-        eventId: 3,
-        userId: 3,
-        status: "waitlist",
-      },
-      {
-        eventId: 4,
-        userId: 4,
-        status: "attending",
-      },
-    ]);
+    await Attendance.bulkCreate(
+      [
+        {
+          eventId: 1,
+          userId: 1,
+          status: "attending",
+        },
+        {
+          eventId: 2,
+          userId: 2,
+          status: "pending",
+        },
+        {
+          eventId: 3,
+          userId: 3,
+          status: "waitlist",
+        },
+        {
+          eventId: 4,
+          userId: 4,
+          status: "attending",
+        },
+      ],
+      options,
+      { validate: true }
+    );
   },
 
   async down(queryInterface, Sequelize) {
