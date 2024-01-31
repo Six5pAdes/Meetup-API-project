@@ -11,7 +11,7 @@
 
 ## USER AUTHENTICATION/AUTHORIZATION
 
-### All endpoints that require authentication
+### 1. All endpoints that require authentication
 
 All endpoints that require a current user to be logged in.
 
@@ -29,7 +29,7 @@ All endpoints that require a current user to be logged in.
     }
     ```
 
-### All endpoints that require proper authorization
+### 2. All endpoints that require proper authorization
 
 All endpoints that require authentication and the current user does not have the
 correct role(s) or permission(s).
@@ -48,7 +48,7 @@ correct role(s) or permission(s).
     }
     ```
 
-### Get the Current User
+### 3. Get the Current User
 
 Returns the information about the current user that is logged in.
 
@@ -91,7 +91,7 @@ Returns the information about the current user that is logged in.
     }
     ```
 
-### Log In a User
+### 4. Log In a User
 
 Logs in a current user with valid credentials and returns the current user's
 information.
@@ -161,7 +161,7 @@ information.
     }
     ```
 
-### Sign Up a User
+### 5. Sign Up a User
 
 Creates a new user, logs them in as the current user, and returns the current
 user's information.
@@ -257,7 +257,7 @@ user's information.
 
 ## GROUPS
 
-### Get all Groups
+### 6. Get all Groups
 
 Returns all the groups.
 
@@ -296,7 +296,7 @@ Returns all the groups.
     }
     ```
 
-### Get all Groups joined or organized by the Current User
+### 7. Get all Groups joined or organized by the Current User
 
 Returns all the groups.
 
@@ -335,7 +335,7 @@ Returns all the groups.
     }
     ```
 
-### Get details of a Group from an id
+### 8. Get details of a Group from an id
 
 Returns the details of a group specified by its id.
 
@@ -410,7 +410,7 @@ Returns the details of a group specified by its id.
     }
     ```
 
-### Create a Group
+### 9. Create a Group
 
 Creates and returns a new group.
 
@@ -477,7 +477,7 @@ Creates and returns a new group.
     }
     ```
 
-### Add an Image to a Group based on the Group's id
+### 10. Add an Image to a Group based on the Group's id
 
 Create and return a new image for a group specified by id.
 
@@ -526,7 +526,7 @@ Create and return a new image for a group specified by id.
     }
     ```
 
-### Edit a Group
+### 11. Edit a Group
 
 Updates and returns an existing group.
 
@@ -607,7 +607,7 @@ Updates and returns an existing group.
     }
     ```
 
-### Delete a Group
+### 12. Delete a Group
 
 Deletes an existing group.
 
@@ -647,7 +647,7 @@ Deletes an existing group.
 
 ## VENUES
 
-### Get All Venues for a Group specified by its id
+### 13. Get All Venues for a Group specified by its id
 
 Returns all venues for a group specified by its id
 
@@ -698,7 +698,7 @@ Returns all venues for a group specified by its id
     }
     ```
 
-### Create a new Venue for a Group specified by its id
+### 14. Create a new Venue for a Group specified by its id
 
 Creates and returns a new venue for a group specified by its id
 
@@ -775,7 +775,7 @@ Creates and returns a new venue for a group specified by its id
     }
     ```
 
-### Edit a Venue specified by its id
+### 15. Edit a Venue specified by its id
 
 Edit a new venue specified by its id
 
@@ -854,7 +854,7 @@ Edit a new venue specified by its id
 
 ## EVENTS
 
-### Get all Events
+### 16. Get all Events
 
 Returns all the events.
 
@@ -919,7 +919,7 @@ Returns all the events.
     }
     ```
 
-### Get all Events of a Group specified by its id
+### 17. Get all Events of a Group specified by its id
 
 Returns all the events of a group specified by its id
 
@@ -997,7 +997,7 @@ Returns all the events of a group specified by its id
     }
     ```
 
-### Get details of an Event specified by its id
+### 18. Get details of an Event specified by its id
 
 Returns the details of an event specified by its id.
 
@@ -1071,7 +1071,7 @@ Returns the details of an event specified by its id.
     }
     ```
 
-### Create an Event for a Group specified by its id
+### 19. Create an Event for a Group specified by its id
 
 Creates and returns a new event for a group specified by its id
 
@@ -1169,7 +1169,7 @@ Creates and returns a new event for a group specified by its id
     }
     ```
 
-### Add an Image to an Event based on the Event's id
+### 20. Add an Image to an Event based on the Event's id
 
 Create and return a new image for an event specified by id.
 
@@ -1218,7 +1218,7 @@ Create and return a new image for an event specified by id.
     }
     ```
 
-### Edit an Event specified by its id
+### 21. Edit an Event specified by its id
 
 Edit and returns an event specified by its id
 
@@ -1316,7 +1316,7 @@ Edit and returns an event specified by its id
     }
     ```
 
-### Delete an Event specified by its id
+### 22. Delete an Event specified by its id
 
 Delete an event specified by its id
 
@@ -1357,7 +1357,7 @@ Delete an event specified by its id
 
 ## MEMBERSHIPS
 
-### Get all Members of a Group specified by its id
+### 23. Get all Members of a Group specified by its id
 
 Returns the members of a group specified by its id.
 
@@ -1451,7 +1451,7 @@ Returns the members of a group specified by its id.
     }
     ```
 
-### Request a Membership for a Group based on the Group's id
+### 24. Request a Membership for a Group based on the Group's id
 
 Request a new membership for a group specified by id.
 
@@ -1518,7 +1518,7 @@ Request a new membership for a group specified by id.
     }
     ```
 
-### Change the status of a membership for a group specified by id
+### 25. Change the status of a membership for a group specified by id
 
 Change the status of a membership for a group specified by id.
 
@@ -1615,7 +1615,7 @@ Change the status of a membership for a group specified by id.
     }
     ```
 
-### Delete membership to a group specified by id
+### 26. Delete membership to a group specified by id
 
 Delete a membership to a group specified by id.
 
@@ -1684,7 +1684,7 @@ Delete a membership to a group specified by id.
 
 ## ATTENDEES
 
-### Get all Attendees of an Event specified by its id
+### 27. Get all Attendees of an Event specified by its id
 
 Returns the attendees of an event specified by its id.
 
@@ -1780,7 +1780,7 @@ Returns the attendees of an event specified by its id.
     }
     ```
 
-### Request to Attend an Event based on the Event's id
+### 28. Request to Attend an Event based on the Event's id
 
 Request attendance for an event specified by id.
 
@@ -1848,7 +1848,7 @@ Request attendance for an event specified by id.
     }
     ```
 
-### Change the status of an attendance for an event specified by id
+### 29. Change the status of an attendance for an event specified by id
 
 Change the status of an attendance for an event specified by id.
 
@@ -1941,7 +1941,7 @@ Change the status of an attendance for an event specified by id.
     }
     ```
 
-### Delete attendance to an event specified by id
+### 30. Delete attendance to an event specified by id
 
 Delete an attendance to an event specified by id.
 
@@ -2010,7 +2010,7 @@ Delete an attendance to an event specified by id.
 
 ## IMAGES
 
-### Delete an Image for a Group
+### 31. Delete an Image for a Group
 
 Delete an existing image for a Group.
 
@@ -2049,7 +2049,7 @@ Delete an existing image for a Group.
     }
     ```
 
-### Delete an Image for an Event
+### 32. Delete an Image for an Event
 
 Delete an existing image for an Event.
 
@@ -2088,7 +2088,7 @@ Delete an existing image for an Event.
     }
     ```
 
-### Add Query Filters to Get All Events
+### 33. Add Query Filters to Get All Events
 
 Return events filtered by query parameters.
 
