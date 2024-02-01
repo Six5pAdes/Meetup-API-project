@@ -89,6 +89,11 @@ router.get("/:eventId", async (req, res) => {
       { model: Venue, attributes: ["id", "city", "state"] },
     ],
   });
+  if (!getEventsById) {
+    res.status(404).json({
+      message: "Event couldn't be found",
+    });
+  }
   res.json({
     Events: getEventsById,
   });
@@ -112,7 +117,7 @@ router.put("/:eventId", requireAuth, async (req, res) => {
   const editEvent = await Event.findByPk(req.params.eventId);
 
   if (!editEvent) {
-    res.status(404).message({
+    res.status(404).json({
       message: "Event couldn't be found",
     });
   }
@@ -162,7 +167,7 @@ router.delete("/:eventId", requireAuth, async (req, res) => {
   const destroyEvent = await Event.findByPk(req.params.eventId);
 
   if (!destroyEvent) {
-    res.status(404).message({
+    res.status(404).json({
       message: "Event couldn't be found",
     });
   }
@@ -178,13 +183,12 @@ router.post("/:eventId/images", requireAuth, async (req, res) => {
 
   const findEvent = await Event.findByPk(req.params.eventId);
   if (!findEvent) {
-    res.status(404).message({
+    res.status(404).json({
       message: "Event couldn't be found",
     });
   }
 
   const newEventImage = await findEvent.createEventImage({
-    eventId: eventId,
     url,
     preview,
   });
@@ -205,7 +209,7 @@ router.get("/:eventId/attendees", async (req, res) => {
     },
   });
   if (!getAttendee) {
-    res.status(404).message({
+    res.status(404).json({
       message: "Event couldn't be found",
     });
   }
@@ -249,7 +253,7 @@ router.delete("/:eventId/attendance/userId", requireAuth, async (req, res) => {
   });
 
   if (!destroyAttendee) {
-    res.status(404).message({
+    res.status(404).json({
       message: "User couldn't be found",
     });
   }
