@@ -75,7 +75,7 @@ router.get("/:groupId", async (req, res) => {
   });
 
   if (!getGroupById) {
-    res.status(404).message({
+    res.status(404).json({
       message: "Group couldn't be found",
     });
   }
@@ -109,7 +109,7 @@ router.put("/:groupId", requireAuth, async (req, res) => {
   const editGroup = await Group.findByPk(req.params.groupId);
 
   if (!editGroup) {
-    res.status(404).message({
+    res.status(404).json({
       message: "Group couldn't be found",
     });
   }
@@ -135,12 +135,7 @@ router.put("/:groupId", requireAuth, async (req, res) => {
 
   await editGroup.save();
   res.json({
-    name: editGroup.name,
-    about: editGroup.about,
-    type: editGroup.type,
-    private: editGroup.private,
-    city: editGroup.city,
-    state: editGroup.state,
+    editGroup,
   });
 });
 
@@ -151,7 +146,7 @@ router.delete("/:groupId", requireAuth, async (req, res) => {
   const destroyGroup = await Group.findByPk(req.params.groupId);
 
   if (!destroyGroup) {
-    res.status(404).message({
+    res.status(404).json({
       message: "Group couldn't be found",
     });
   }
@@ -167,13 +162,12 @@ router.post("/:groupId/images", requireAuth, async (req, res) => {
 
   const findGroup = await Group.findByPk(req.params.groupId);
   if (!findGroup) {
-    res.status(404).message({
+    res.status(404).json({
       message: "Group couldn't be found",
     });
   }
 
   const newGroupImage = await findGroup.createGroupImage({
-    groupId: groupId,
     url,
     preview,
   });
@@ -186,9 +180,9 @@ router.post("/:groupId/images", requireAuth, async (req, res) => {
 // 13. get all group venues by id
 // require authentication
 router.get("/:groupId/venues", requireAuth, async (req, res) => {
-  const getVenueById = await Venue.findAll({
-    where: { groupId: req.params.groupId },
-  });
+  const getVenueById = await Venue.findByPk(req.params.groupId);
+  if (!getVenueById)
+    res.status(404).json({ message: "Group couldn't be found" });
   res.json({ Venues: getVenueById });
 });
 
@@ -205,6 +199,9 @@ router.post("/:groupId/venues", requireAuth, async (req, res) => {
     lat,
     lng,
   });
+  if (!makeNewVenue)
+    res.status(404).json({ message: "Group couldn't be found" });
+  res.json({ Venues: getVenueById });
   res.json(makeNewVenue);
 });
 
@@ -231,6 +228,11 @@ router.get("/:groupId/events", async (req, res) => {
       { model: Venue, attributes: ["id", "city", "state"] },
     ],
   });
+  if (!getEventsById) {
+    res.status(404).json({
+      message: "Group couldn't be found",
+    });
+  }
   res.json({
     Events: getEventsById,
   });
@@ -264,7 +266,7 @@ router.post("/:groupId/events", requireAuth, async (req, res) => {
   });
 
   if (!newEvents) {
-    res.status(404).message({
+    res.status(404).json({
       message: "Venue couldn't be found",
     });
   }
@@ -286,7 +288,7 @@ router.get("/:groupId/members", async (req, res) => {
     },
   });
   if (!getMember) {
-    res.status(404).message({
+    res.status(404).json({
       message: "Group couldn't be found",
     });
   }
@@ -302,6 +304,11 @@ router.post("/:groupId/membership", requireAuth, async (req, res) => {
     userId: user.id,
     status: "pending",
   });
+  if (!newMember) {
+    res.status(404).json({
+      message: "Group couldn't be found",
+    });
+  }
   res.json(newMember);
 });
 
@@ -332,7 +339,7 @@ router.delete(
     });
 
     if (!destroyMember) {
-      res.status(404).message({
+      res.status(404).json({
         message: "User couldn't be found",
       });
     }

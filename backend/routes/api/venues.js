@@ -15,7 +15,7 @@ router.put("/:venueId", requireAuth, async (req, res) => {
   const editVenue = await Venue.findByPk(req.params.venueId);
 
   if (!editVenue) {
-    res.status(404).message({
+    res.status(404).json({
       message: "Venue couldn't be found",
     });
   }
