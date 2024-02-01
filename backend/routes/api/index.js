@@ -15,7 +15,8 @@ router.use("/users", usersRouter);
 router.use("/groups", groupsRouter);
 router.use("/venues", venuesRouter);
 router.use("/events", eventsRouter);
-router.use("/images", imagesRouter);
+router.use("/group-images", imagesRouter);
+router.use("/event-images", imagesRouter);
 
 router.post("/test", (req, res) => {
   res.json({ requestBody: req.body });
