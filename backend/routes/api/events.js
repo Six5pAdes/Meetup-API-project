@@ -1,13 +1,18 @@
 const express = require("express");
-const requireAuth = require("../../utils/auth");
-const { Event } = require("../../db/models");
+const { requireAuth } = require("../../utils/auth");
+const { Event, Venue } = require("../../db/models");
 
 const router = express.Router();
 
 // 16. get all events
 router.get("/", async (req, res) => {
+  const everyEvent = await Event.unscoped().findAll({
+    include: [{ model: Membership }, { model: EventImage }],
+  });
   // 33. add query filters to get all events
-  res.json();
+  res.json({
+    Events: everyEvent,
+  });
 });
 
 // 18. get event details by id
