@@ -1,11 +1,14 @@
 const express = require("express");
 const { setTokenCookie, requireAuth } = require("../../utils/auth");
 const {
-  Group,
-  GroupImage,
-  Membership,
   User,
+  Group,
   Venue,
+  Event,
+  GroupImage,
+  EventImage,
+  Membership,
+  Attendance,
 } = require("../../db/models");
 
 const { check } = require("express-validator");
@@ -170,6 +173,7 @@ router.post("/:groupId/images", requireAuth, async (req, res) => {
   }
 
   const newGroupImage = await findGroup.createGroupImage({
+    groupId: groupId,
     url,
     preview,
   });
@@ -209,14 +213,63 @@ router.post("/:groupId/venues", requireAuth, async (req, res) => {
 // event endpoints
 // 17. get all group events by id
 router.get("/:groupId/events", async (req, res) => {
-  res.json();
+  const getEventsById = await Event.findAll({
+    where: { groupId: req.params.groupId },
+    attributes: [
+      "id",
+      "groupId",
+      "venueId",
+      "name",
+      "type",
+      "startDate",
+      "endDate",
+    ],
+    include: [
+      { model: Attendance },
+      { model: EventImage, attributes: [["preview", "previewImage"]] },
+      { model: Group, attributes: ["id", "name", "city", "state"] },
+      { model: Venue, attributes: ["id", "city", "state"] },
+    ],
+  });
+  res.json({
+    Events: getEventsById,
+  });
 });
 
 // 19. create group events by id
 // require authentication
 // require authorization
 router.post("/:groupId/events", requireAuth, async (req, res) => {
-  res.json();
+  const {
+    venueId,
+    name,
+    description,
+    type,
+    capacity,
+    price,
+    startDate,
+    endDate,
+  } = req.body;
+
+  const newEvents = await Event.create({
+    venueId,
+    groupId: req.params.groupId,
+    name,
+    description,
+    type,
+    capacity,
+    price,
+    startDate,
+    endDate,
+  });
+
+  if (!newEvents) {
+    res.status(404).message({
+      message: "Venue couldn't be found",
+    });
+  }
+
+  res.json(newEvents);
 });
 
 // <----------------------------------------------------->
@@ -224,20 +277,47 @@ router.post("/:groupId/events", requireAuth, async (req, res) => {
 // membership endpoints
 // 23. get group members by id
 router.get("/:groupId/members", async (req, res) => {
-  res.json();
+  const getMember = await Membership.findAll({
+    where: { groupId: req.params.groupId },
+    attributes: ["status"],
+    include: {
+      model: User,
+      attributes: ["id", "firstName", "lastName"],
+    },
+  });
+  if (!getMember) {
+    res.status(404).message({
+      message: "Group couldn't be found",
+    });
+  }
+  res.json({ Members: getMember });
 });
 
 // 24. request group membership by id
 // require authentication
 router.post("/:groupId/membership", requireAuth, async (req, res) => {
-  res.json();
+  const { user } = req;
+  const newMember = await Membership.create({
+    groupId: req.params.groupId,
+    userId: user.id,
+    status: "pending",
+  });
+  res.json(newMember);
 });
 
 // 25. change membership status for group specified by id
 // require authentication
 // require [proper] authorization
 router.put("/:groupId/membership", requireAuth, async (req, res) => {
-  res.json();
+  const { memberId, status } = req.body;
+  const editMember = await Membership.findOne({
+    where: { groupId: req.params.groupId, userId: memberId },
+  });
+  if (status) {
+    editMember.status = status;
+  } else editMember.status;
+  await editMember.save();
+  res.json(editMember);
 });
 
 // 26. delete group membership specified by id
@@ -247,7 +327,17 @@ router.delete(
   "/:groupId/membership/:memberId",
   requireAuth,
   async (req, res) => {
-    res.json();
+    const destroyMember = await Membership.findOne({
+      where: { groupId: req.params.groupId, userId: req.params.userId },
+    });
+
+    if (!destroyMember) {
+      res.status(404).message({
+        message: "User couldn't be found",
+      });
+    }
+    await destroyMember.destroy();
+    res.json({ message: "Successfully deleted membership from group" });
   }
 );
 
