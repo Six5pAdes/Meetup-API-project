@@ -7,7 +7,7 @@ const router = express.Router();
 // 31. delete group image
 // require authentication
 // require [proper] authorization
-router.delete("/group-images/:imageId", requireAuth, async (req, res) => {
+router.delete("/:imageId", requireAuth, async (req, res) => {
   const { user } = req;
   const destroyGroupImg = await GroupImage.findByPk(req.params.imageId);
   if (!destroyGroupImg) {
@@ -33,7 +33,7 @@ router.delete("/group-images/:imageId", requireAuth, async (req, res) => {
     });
   } else {
     res.status(403).json({
-      message: "Current user must be the organizer or 'co-host' of the Group",
+      message: "forbidden",
     });
   }
 });

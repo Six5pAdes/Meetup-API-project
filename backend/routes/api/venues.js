@@ -84,8 +84,7 @@ router.put("/:venueId", [requireAuth, validateVenue], async (req, res) => {
     res.json(editVenue);
   } else {
     res.status(403).json({
-      message:
-        "Current User must be the organizer of the group or a member of the group with a status of 'co-host'",
+      message: "forbidden",
     });
   }
 });

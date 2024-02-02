@@ -33,8 +33,7 @@ router.delete("/:imageId", requireAuth, async (req, res) => {
     });
   } else {
     res.status(403).json({
-      message:
-        "Current user must be the organizer or 'co-host' of the Group that the Event belongs to",
+      message: "forbidden",
     });
   }
 });

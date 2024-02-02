@@ -76,16 +76,17 @@ router.get("/", async (req, res) => {
     where.startDate = { [Op.substring]: startDate };
   } else where.startDate;
 
-  const numAttending = await Attendance.count({ group: "eventId" });
+  const numAttending = await Attendance.findAll({
+    order: [["eventId", "ASC"]],
+  });
   const everyImage = await EventImage.findAll({
-    group: "eventId",
+    order: [["eventId", "ASC"]],
   });
   const getGroupsAndVenues = await Event.findAll({
     include: [
       { model: Group, attributes: ["id", "name", "city", "state"] },
       { model: Venue, attributes: ["id", "city", "state"] },
     ],
-    group: "event.id",
   });
 
   const everyEvent = await Event.findAll({
@@ -105,11 +106,18 @@ router.get("/", async (req, res) => {
   const results = [];
   everyEvent.forEach((event) => results.push(event.toJSON()));
 
+  const num = [];
+  numAttending.forEach((attendee) => num.push([attendee.toJSON()]));
+
   for (let index = 0; index < results.length; index++) {
-    results[index].numAttending = numAttending[index].count;
-    results[index].previewImage = everyImage[index].url;
+    results[index].numAttending = num[index].length;
+    if (everyImage[index].url) {
+      results[index].previewImage = everyImage[index].url;
+    }
     results[index].Group = getGroupsAndVenues[index].Group;
-    results[index].Venue = getGroupsAndVenues[index].Venue;
+    if (getGroupsAndVenues[index].Venue) {
+      results[index].Venue = getGroupsAndVenues[index].Venue;
+    }
   }
 
   res.json({
@@ -139,25 +147,29 @@ router.get("/:eventId", async (req, res) => {
     });
   }
 
-  const numAttending = await Attendance.count({
+  const numAttending = await Attendance.findAll({
     where: { eventId: req.params.eventId },
   });
   const everyImage = await EventImage.findOne({
     where: { eventId: req.params.eventId },
+    attributes: ["id", "url", "preview"],
   });
   const getGroupsAndVenues = await Event.findByPk(req.params.eventId, {
     include: [
       { model: Group, attributes: ["id", "name", "city", "state"] },
       { model: Venue, attributes: ["id", "city", "state"] },
     ],
-    group: "event.id",
   });
 
   const results = getEventsById.toJSON();
   results.numAttending = numAttending;
   results.Group = getGroupsAndVenues.Group;
-  results.Venue = getGroupsAndVenues.Venue;
-  results.everyImage = everyImage;
+  if (getGroupsAndVenues.Venue) {
+    results.Venue = getGroupsAndVenues.Venue;
+  }
+  if (everyImage) {
+    results.everyImage = everyImage;
+  }
 
   res.json(results);
 });
@@ -231,8 +243,7 @@ router.put("/:eventId", [requireAuth, validateEvent], async (req, res) => {
     res.json(editEvent);
   } else {
     res.status(403).json({
-      message:
-        "Current User must be the organizer of the group or a member of the group with a status of 'co-host'",
+      message: "forbidden",
     });
   }
 });
@@ -264,8 +275,7 @@ router.delete("/:eventId", requireAuth, async (req, res) => {
     res.json({ message: "Successfully deleted" });
   } else {
     res.status(403).json({
-      message:
-        "Current User must be the organizer of the group or a member of the group with a status of 'co-host'",
+      message: "forbidden",
     });
   }
 });
@@ -284,7 +294,7 @@ router.post("/:eventId/images", requireAuth, async (req, res) => {
   }
   if (findGroup.organizerId !== user.id) {
     res.status(403).json({
-      message: "Current User must be the organizer for the group",
+      message: "forbidden",
     });
   }
 
@@ -328,6 +338,16 @@ router.get("/:eventId/attendees", async (req, res) => {
       },
     });
     res.json({ Attendees: getAttendee });
+  } else {
+    const getAttendee = await User.findAll({
+      attributes: ["id", "firstName", "lastName"],
+      include: {
+        model: Attendance,
+        where: { eventId: findEvent.id, status: ["attending", "waitlist"] },
+        attributes: ["status"],
+      },
+    });
+    res.json({ Attendees: getAttendee });
   }
 });
 
@@ -349,7 +369,7 @@ router.post("/:eventId/attendance", requireAuth, async (req, res) => {
   });
   if (!memberValidate) {
     res.status(403).json({
-      message: "Current User must be a member of the group",
+      message: "forbidden",
     });
   }
 
@@ -422,8 +442,7 @@ router.put("/:eventId/attendance", requireAuth, async (req, res) => {
       res.json(editAttendee);
     } else {
       res.status(403).json({
-        message:
-          "Current User must already be the organizer or have a membership to the group with the status of 'co-host'",
+        message: "forbidden",
       });
     }
   }
@@ -432,12 +451,12 @@ router.put("/:eventId/attendance", requireAuth, async (req, res) => {
 // 30. delete event attendance specified by id
 // require authentication
 // require [proper] authorization
-router.delete("/:eventId/attendance/userId", requireAuth, async (req, res) => {
+router.delete("/:eventId/attendance/:userId", requireAuth, async (req, res) => {
   const { user } = req;
   const getEventById = Event.findByPk(req.params.eventId);
   if (!getEventById)
     res.status(404).json({ message: "Event couldn't be found" });
-  const getUserById = User.findByPk(req.params.eventId);
+  const getUserById = User.findByPk(req.params.userId);
   if (!getUserById) res.status(404).json({ message: "User couldn't be found" });
 
   const destroyAttendee = await Attendance.findOne({
@@ -456,20 +475,20 @@ router.delete("/:eventId/attendance/userId", requireAuth, async (req, res) => {
     where: { userId: user.id, groupId: findEvent.groupId },
   });
   const findOrganizer = await Group.findOne({
-    where: { id: eventId.groupId },
+    where: { id: findEvent.groupId },
   });
 
   if (
-    (findMember && findMember.status === "member") ||
-    (findMember && findMember.status === "co-host") ||
+    (findMember &&
+      findMember.status === "member" &&
+      findMember.userId === destroyAttendee.userId) ||
     (findOrganizer && findOrganizer.organizerId === user.id)
   ) {
     await destroyAttendee.destroy();
     res.json({ message: "Successfully deleted attendance from event" });
   } else {
     res.status(403).json({
-      message:
-        "Current User must be the host of the group, or the user whose attendance is being deleted",
+      message: "forbidden",
     });
   }
 });
