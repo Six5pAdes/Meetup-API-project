@@ -31,11 +31,7 @@ const validateEvent = [
     .withMessage("Capacity must be an integer"),
   check("price")
     .exists({ checkFalsy: true })
-    .isCurrency({
-      require_symbol: false,
-      allow_negatives: false,
-      require_decimal: false,
-    })
+    .isFloat()
     .withMessage("Price is invalid"),
   check("description")
     .exists({ checkFalsy: true })
@@ -292,7 +288,7 @@ router.post("/:eventId/images", requireAuth, async (req, res) => {
       message: "Event couldn't be found",
     });
   }
-  if (findGroup.organizerId !== user.id) {
+  if (findEvent.organizerId !== user.id) {
     res.status(403).json({
       message: "forbidden",
     });
