@@ -9,8 +9,10 @@ const router = express.Router();
 // require [proper] authorization
 router.delete("/:imageId", requireAuth, async (req, res) => {
   const destroyEventImg = await EventImage.findByPk(req.params.imageId);
-  await EventImage.destroy();
-  res.json(destroyEventImg);
+  await destroyEventImg.destroy();
+  res.json({
+    message: "Successfully deleted",
+  });
 });
 
 module.exports = router;

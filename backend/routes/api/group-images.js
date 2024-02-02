@@ -9,8 +9,10 @@ const router = express.Router();
 // require [proper] authorization
 router.delete("/group-images/:imageId", requireAuth, async (req, res) => {
   const destroyGroupImg = await GroupImage.findByPk(req.params.imageId);
-  await GroupImage.destroy();
-  res.json(destroyGroupImg);
+  await destroyGroupImg.destroy();
+  res.json({
+    message: "Successfully deleted",
+  });
 });
 
 module.exports = router;
