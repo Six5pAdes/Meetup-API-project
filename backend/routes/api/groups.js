@@ -344,7 +344,7 @@ router.get("/:groupId/venues", requireAuth, async (req, res) => {
     getVenueByGroupId.forEach((result) => results.push(result.toJSON()));
     res.json({ Venues: results });
   } else {
-    res.json({
+    res.status(403).json({
       message:
         "Current User must be the organizer of the group or a member of the group with a status of 'co-host'",
     });
@@ -381,7 +381,7 @@ router.post(
       });
       res.json(makeNewVenue);
     } else {
-      res.json({
+      res.status(403).json({
         message:
           "Current User must be the organizer of the group or a member of the group with a status of 'co-host'",
       });
@@ -498,7 +498,7 @@ router.post(
       });
       res.json(newEvents);
     } else {
-      res.json({
+      res.status(403).json({
         message:
           "Current User must be the organizer of the group or a member of the group with a status of 'co-host'",
       });
@@ -612,7 +612,7 @@ router.put("/:groupId/membership", requireAuth, async (req, res) => {
     where: { groupId: req.params.groupId, userId: memberId },
   });
   if (status && status === "pending") {
-    res.status(404).json({
+    res.status(400).json({
       message: "Bad Request",
       errors: {
         status: "Cannot change a membership status to pending",
@@ -629,7 +629,7 @@ router.put("/:groupId/membership", requireAuth, async (req, res) => {
       await changeMember.save();
       res.json(changeMember);
     } else {
-      return res.json({
+      return res.status(403).json({
         message:
           "Current User must already be the organizer or have a membership to the group with the status of 'co-host'",
       });
@@ -642,7 +642,7 @@ router.put("/:groupId/membership", requireAuth, async (req, res) => {
       await changeMember.save();
       res.json(changeMember);
     } else {
-      return res.json({
+      return res.status(403).json({
         message: "Current User must already be the organizer",
       });
     }
@@ -680,7 +680,7 @@ router.delete(
       await destroyMember.destroy();
       res.json({ message: "Successfully deleted membership from group" });
     } else {
-      res.json({
+      res.status(403).json({
         message:
           "Current User must be the host of the group, or the user whose membership is being deleted",
       });

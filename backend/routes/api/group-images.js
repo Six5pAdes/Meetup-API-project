@@ -1,6 +1,6 @@
 const express = require("express");
 const { requireAuth } = require("../../utils/auth");
-const { GroupImage } = require("../../db/models");
+const { GroupImage, Group, Membership } = require("../../db/models");
 
 const router = express.Router();
 
@@ -8,11 +8,34 @@ const router = express.Router();
 // require authentication
 // require [proper] authorization
 router.delete("/group-images/:imageId", requireAuth, async (req, res) => {
+  const { user } = req;
   const destroyGroupImg = await GroupImage.findByPk(req.params.imageId);
-  await destroyGroupImg.destroy();
-  res.json({
-    message: "Successfully deleted",
+  if (!destroyGroupImg) {
+    res.status(404).json({
+      message: "Group Image couldn't be found",
+    });
+  }
+
+  const parentGroup = await GroupImage.findByPk(req.params.imageId, {
+    include: { model: Group },
   });
+  const member = await Membership.findOne({
+    where: { userId: user.id, groupId: parentGroup.Group.id },
+  });
+
+  if (
+    (member && member.status === "co-host") ||
+    parentGroup.Group.organizerId === user.id
+  ) {
+    await destroyGroupImg.destroy();
+    res.json({
+      message: "Successfully deleted",
+    });
+  } else {
+    res.status(403).json({
+      message: "Current user must be the organizer or 'co-host' of the Group",
+    });
+  }
 });
 
 module.exports = router;
