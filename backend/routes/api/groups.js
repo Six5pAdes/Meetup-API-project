@@ -106,14 +106,14 @@ const validateEvent = [
 
 // 6. get all groups
 router.get("/", async (req, res) => {
-  const allMembers = await Membership.count({
-    group: "groupId",
+  const allMembers = await Membership.findAll({
+    order: [["groupId", "ASC"]],
   });
   const everyImage = await GroupImage.findAll({
-    group: "groupId",
+    order: [["groupId", "ASC"]],
   });
 
-  const everyGroup = await Group.unscoped().findAll({
+  const everyGroup = await Group.findAll({
     attributes: [
       "id",
       "organizerId",
@@ -126,14 +126,19 @@ router.get("/", async (req, res) => {
       "createdAt",
       "updatedAt",
     ],
-    group: "id",
   });
 
   const results = [];
   everyGroup.forEach((group) => results.push(group.toJSON()));
+
+  const num = [];
+  allMembers.forEach((member) => num.push([member.toJSON()]));
   for (let index = 0; index < results.length; index++) {
-    results[index].numMembers = allMembers[index].count;
-    results[index].previewImage = everyImage[index].url;
+    if (num[index] && num[index].length)
+      results[index].numMembers = num[index].length;
+    if (everyImage[index].url) {
+      results[index].previewImage = everyImage[index].url;
+    }
   }
 
   res.json({
@@ -145,16 +150,16 @@ router.get("/", async (req, res) => {
 // require authentication
 router.get("/current", requireAuth, async (req, res) => {
   const { user } = req;
-  const allMembers = await Membership.count({
+  const allMembers = await Membership.findAll({
     where: { userId: user.id },
-    group: "groupId",
+    order: [["groupId", "ASC"]],
   });
   const everyImage = await GroupImage.findAll({
     include: { model: Group, where: { organizerId: user.id } },
-    group: "groupId",
+    order: [["groupId", "ASC"]],
   });
 
-  const everyGroup = await Group.unscoped().findAll({
+  const everyGroup = await Group.findAll({
     where: { organizerId: user.id },
     attributes: [
       "id",
@@ -168,14 +173,19 @@ router.get("/current", requireAuth, async (req, res) => {
       "createdAt",
       "updatedAt",
     ],
-    group: "id",
   });
 
   const results = [];
   everyGroup.forEach((group) => results.push(group.toJSON()));
+
+  const num = [];
+  allMembers.forEach((member) => num.push([member.toJSON()]));
   for (let index = 0; index < results.length; index++) {
-    results[index].numMembers = allMembers[index].count;
-    results[index].previewImage = everyImage[index].url;
+    if (num[index] && num[index].length)
+      results[index].numMembers = num[index].length;
+    if (everyImage[index].url) {
+      results[index].previewImage = everyImage[index].url;
+    }
   }
 
   res.json({
@@ -193,7 +203,7 @@ router.get("/:groupId", async (req, res) => {
     });
   }
 
-  const allMembers = await Membership.count({
+  const allMembers = await Membership.findAll({
     where: { groupId: req.params.groupId },
   });
   const everyImage = await GroupImage.findAll({
@@ -240,6 +250,7 @@ router.post("/", [requireAuth, validateGroup], async (req, res) => {
 // require authentication
 // require [proper] authorization
 router.put("/:groupId", [requireAuth, validateGroup], async (req, res) => {
+  const { user } = req;
   const { name, about, type, private, city, state } = req.body;
 
   const editGroup = await Group.findByPk(req.params.groupId);
@@ -250,7 +261,7 @@ router.put("/:groupId", [requireAuth, validateGroup], async (req, res) => {
   }
   if (editGroup.organizerId !== user.id) {
     res.status(403).json({
-      message: "Group must belong to the current user",
+      message: "forbidden",
     });
   }
 
@@ -283,15 +294,22 @@ router.put("/:groupId", [requireAuth, validateGroup], async (req, res) => {
 // require authentication
 // require [proper] authorization
 router.delete("/:groupId", requireAuth, async (req, res) => {
+  const { user } = req;
   const destroyGroup = await Group.findByPk(req.params.groupId);
-
   if (!destroyGroup) {
     res.status(404).json({
       message: "Group couldn't be found",
     });
   }
-  await destroyGroup.destroy();
-  res.json({ message: "Successfully deleted" });
+
+  if (destroyGroup.organizerId === user.id) {
+    await destroyGroup.destroy();
+    res.json({ message: "Successfully deleted" });
+  } else {
+    res.status(403).json({
+      message: "forbidden",
+    });
+  }
 });
 
 // 10. add image to group based on group id
@@ -310,7 +328,7 @@ router.post("/:groupId/images", requireAuth, async (req, res) => {
 
   if (findGroup.organizerId !== user.id) {
     res.status(403).json({
-      message: "Current User must be the organizer for the group",
+      message: "forbidden",
     });
   }
 
@@ -345,8 +363,7 @@ router.get("/:groupId/venues", requireAuth, async (req, res) => {
     res.json({ Venues: results });
   } else {
     res.status(403).json({
-      message:
-        "Current User must be the organizer of the group or a member of the group with a status of 'co-host'",
+      message: "forbidden",
     });
   }
 });
@@ -382,8 +399,7 @@ router.post(
       res.json(makeNewVenue);
     } else {
       res.status(403).json({
-        message:
-          "Current User must be the organizer of the group or a member of the group with a status of 'co-host'",
+        message: "forbidden",
       });
     }
   }
@@ -401,16 +417,17 @@ router.get("/:groupId/events", async (req, res) => {
     });
   }
 
-  const numAttending = await Attendance.count({ group: "eventId" });
+  const numAttending = await Attendance.findAll({
+    order: [["eventId", "ASC"]],
+  });
   const everyImage = await EventImage.findAll({
-    group: "eventId",
+    order: [["eventId", "ASC"]],
   });
   const getGroupsAndVenues = await Event.findAll({
     include: [
       { model: Group, attributes: ["id", "name", "city", "state"] },
       { model: Venue, attributes: ["id", "city", "state"] },
     ],
-    group: "event.id",
   });
 
   const getEvent = await Event.findAll({
@@ -429,11 +446,18 @@ router.get("/:groupId/events", async (req, res) => {
   let results = [];
   getEvent.forEach((event) => results.push(event.toJSON()));
 
+  const num = [];
+  numAttending.forEach((attendee) => num.push([attendee.toJSON()]));
+
   for (let index = 0; index < results.length; index++) {
-    results[index].numAttending = numAttending[index].count;
-    results[index].previewImage = everyImage[index].url;
+    results[index].numAttending = num[index].length;
+    if (everyImage[index].url) {
+      results[index].previewImage = everyImage[index].url;
+    }
     results[index].Group = getGroupsAndVenues[index].Group;
-    results[index].Venue = getGroupsAndVenues[index].Venue;
+    if (getGroupsAndVenues[index].Venue) {
+      results[index].Venue = getGroupsAndVenues[index].Venue;
+    }
   }
 
   res.json({
@@ -499,8 +523,7 @@ router.post(
       res.json(newEvents);
     } else {
       res.status(403).json({
-        message:
-          "Current User must be the organizer of the group or a member of the group with a status of 'co-host'",
+        message: "forbidden",
       });
     }
   }
@@ -537,12 +560,12 @@ router.get("/:groupId/members", async (req, res) => {
     });
     res.json({ Members: getMember });
   } else {
-    const getMember = await Membership.findAll({
-      where: { groupId: req.params.groupId },
-      status: ["co-host", "organizer", "member"],
+    const getMember = await User.findAll({
+      attributes: ["id", "firstName", "lastName"],
       include: {
-        model: User,
-        attributes: ["id", "firstName", "lastName"],
+        model: Membership,
+        where: { groupId: getGroupById.id },
+        status: ["co-host", "organizer", "member"],
       },
     });
     res.json({ Members: getMember });
@@ -630,8 +653,7 @@ router.put("/:groupId/membership", requireAuth, async (req, res) => {
       res.json(changeMember);
     } else {
       return res.status(403).json({
-        message:
-          "Current User must already be the organizer or have a membership to the group with the status of 'co-host'",
+        message: "forbidden",
       });
     }
   }
@@ -643,7 +665,7 @@ router.put("/:groupId/membership", requireAuth, async (req, res) => {
       res.json(changeMember);
     } else {
       return res.status(403).json({
-        message: "Current User must already be the organizer",
+        message: "forbidden",
       });
     }
   }
@@ -662,7 +684,7 @@ router.delete(
       res.status(404).json({ message: "User couldn't be found" });
     const getGroupById = await Group.findByPk(req.params.groupId);
     if (!getGroupById)
-      res.status(404).json({ message: "User couldn't be found" });
+      res.status(404).json({ message: "Group couldn't be found" });
 
     const destroyMember = await Membership.findOne({
       where: { groupId: req.params.groupId, userId: req.params.memberId },
@@ -676,13 +698,15 @@ router.delete(
     const userMembership = await Membership.findOne({
       where: { userId: user.id, groupId: getGroupById.id },
     });
-    if (userMembership || user.id === getGroupById.organizerId) {
+    if (
+      userMembership.userId === destroyMember.userId ||
+      user.id === getGroupById.organizerId
+    ) {
       await destroyMember.destroy();
       res.json({ message: "Successfully deleted membership from group" });
     } else {
       res.status(403).json({
-        message:
-          "Current User must be the host of the group, or the user whose membership is being deleted",
+        message: "forbidden",
       });
     }
   }
