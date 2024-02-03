@@ -59,13 +59,11 @@ const validateVenue = [
     .withMessage("State is required."),
   check("lat")
     .exists({ checkFalsy: true })
-    .isInt({ min: -90 })
-    .isInt({ max: 90 })
+    .isFloat({ min: -90, max: 90 })
     .withMessage("Latitude must within -90 and 90 degrees."),
   check("lng")
     .exists({ checkFalsy: true })
-    .isInt({ min: -180 })
-    .isInt({ max: 180 })
+    .isFloat({ min: -180, max: 180 })
     .withMessage("Longitude must within -180 and 180 degrees."),
   handleValidationErrors,
 ];
@@ -85,11 +83,7 @@ const validateEvent = [
     .withMessage("Capacity must be an integer"),
   check("price")
     .exists({ checkFalsy: true })
-    .isCurrency({
-      require_symbol: false,
-      allow_negatives: false,
-      require_decimal: false,
-    })
+    .isFloat()
     .withMessage("Price is invalid"),
   check("description")
     .exists({ checkFalsy: true })
@@ -136,7 +130,7 @@ router.get("/", async (req, res) => {
   for (let index = 0; index < results.length; index++) {
     if (num[index] && num[index].length)
       results[index].numMembers = num[index].length;
-    if (everyImage[index].url) {
+    if (everyImage[index] && everyImage[index].url) {
       results[index].previewImage = everyImage[index].url;
     }
   }
@@ -183,7 +177,7 @@ router.get("/current", requireAuth, async (req, res) => {
   for (let index = 0; index < results.length; index++) {
     if (num[index] && num[index].length)
       results[index].numMembers = num[index].length;
-    if (everyImage[index].url) {
+    if (everyImage[index] && everyImage[index].url) {
       results[index].previewImage = everyImage[index].url;
     }
   }
@@ -699,7 +693,7 @@ router.delete(
       where: { userId: user.id, groupId: getGroupById.id },
     });
     if (
-      userMembership.userId === destroyMember.userId ||
+      (userMembership && userMembership.userId === destroyMember.userId) ||
       user.id === getGroupById.organizerId
     ) {
       await destroyMember.destroy();
