@@ -280,6 +280,7 @@ router.delete("/:eventId", requireAuth, async (req, res) => {
 // require authentication
 // require [proper] authorization
 router.post("/:eventId/images", requireAuth, async (req, res) => {
+  const { user } = req;
   const { url, preview } = req.body;
 
   const findEvent = await Event.findByPk(req.params.eventId);

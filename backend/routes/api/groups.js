@@ -59,13 +59,11 @@ const validateVenue = [
     .withMessage("State is required."),
   check("lat")
     .exists({ checkFalsy: true })
-    .isFloat({ min: -90 })
-    .isFloat({ max: 90 })
+    .isFloat({ min: -90, max: 90 })
     .withMessage("Latitude must within -90 and 90 degrees."),
   check("lng")
     .exists({ checkFalsy: true })
-    .isFloat({ min: -180 })
-    .isFloat({ max: 180 })
+    .isFloat({ min: -180, max: 180 })
     .withMessage("Longitude must within -180 and 180 degrees."),
   handleValidationErrors,
 ];
@@ -85,11 +83,7 @@ const validateEvent = [
     .withMessage("Capacity must be an integer"),
   check("price")
     .exists({ checkFalsy: true })
-    .isCurrency({
-      require_symbol: false,
-      allow_negatives: false,
-      require_decimal: false,
-    })
+    .isFloat()
     .withMessage("Price is invalid"),
   check("description")
     .exists({ checkFalsy: true })
@@ -699,7 +693,7 @@ router.delete(
       where: { userId: user.id, groupId: getGroupById.id },
     });
     if (
-      userMembership.userId === destroyMember.userId ||
+      (userMembership && userMembership.userId === destroyMember.userId) ||
       user.id === getGroupById.organizerId
     ) {
       await destroyMember.destroy();
