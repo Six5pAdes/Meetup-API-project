@@ -19,20 +19,20 @@ const validateVenue = [
   check("city")
     .exists({ checkFalsy: true })
     .isAlpha("en-US", { ignore: [" ", "-"] })
+    .notEmpty()
     .withMessage("City is required."),
   check("state")
     .exists({ checkFalsy: true })
     .isAlpha("en-US", { ignore: "-" })
+    .notEmpty()
     .withMessage("State is required."),
   check("lat")
     .exists({ checkFalsy: true })
-    .isInt({ min: -90 })
-    .isInt({ max: 90 })
+    .isFloat({ min: -90, max: 90 })
     .withMessage("Latitude must within -90 and 90 degrees."),
   check("lng")
     .exists({ checkFalsy: true })
-    .isInt({ min: -180 })
-    .isInt({ max: 180 })
+    .isFloat({ min: -180, max: 180 })
     .withMessage("Longitude must within -180 and 180 degrees."),
   handleValidationErrors,
 ];
