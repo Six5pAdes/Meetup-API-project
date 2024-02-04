@@ -33,14 +33,8 @@ const validateGroup = [
     .exists({ checkFalsy: true })
     .isBoolean()
     .withMessage("Private must be a boolean."),
-  check("city")
-    .exists({ checkFalsy: true })
-    .isAlpha("en-US", { ignore: [" ", "-"] })
-    .withMessage("City is required."),
-  check("state")
-    .exists({ checkFalsy: true })
-    .isAlpha("en-US", { ignore: "-" })
-    .withMessage("State is required."),
+  check("city").exists({ checkFalsy: true }).withMessage("City is required."),
+  check("state").exists({ checkFalsy: true }).withMessage("State is required."),
   handleValidationErrors,
 ];
 
@@ -52,10 +46,12 @@ const validateVenue = [
   check("city")
     .exists({ checkFalsy: true })
     .isAlpha("en-US", { ignore: [" ", "-"] })
+    .notEmpty()
     .withMessage("City is required."),
   check("state")
     .exists({ checkFalsy: true })
     .isAlpha("en-US", { ignore: "-" })
+    .notEmpty()
     .withMessage("State is required."),
   check("lat")
     .exists({ checkFalsy: true })
@@ -72,7 +68,7 @@ const validateEvent = [
   check("name")
     .exists({ checkFalsy: true })
     .isLength({ max: 60 })
-    .withMessage("Name must be 60 characters or less."),
+    .withMessage("Name must be at least 5 characters."),
   check("type")
     .exists({ checkFalsy: true })
     .isIn(["Online", "In person"])
@@ -84,6 +80,13 @@ const validateEvent = [
   check("price")
     .exists({ checkFalsy: true })
     .isFloat()
+    .custom((value) => {
+      value = value.toFixed(2);
+      if (value.toString().split(".")[1].length > 2) {
+        throw new Error("Price is invalid");
+      }
+      return true;
+    })
     .withMessage("Price is invalid"),
   check("description")
     .exists({ checkFalsy: true })
@@ -91,9 +94,20 @@ const validateEvent = [
     .withMessage("Description is required"),
   check("startDate")
     .exists({ checkFalsy: true })
+    .isISO8601()
+    .isAfter(new Date().toLocaleString())
     .withMessage("Start date must be in the future"),
   check("endDate")
     .exists({ checkFalsy: true })
+    .isISO8601()
+    .isAfter(new Date().toLocaleString())
+    .custom((value, { req }) => {
+      const startDate = new Date(req.body.startDate);
+      const endDate = new Date(value);
+      if (endDate <= startDate) {
+        throw new Error("End date is less than start date");
+      } else return true;
+    })
     .withMessage("End date is less than start date"),
   handleValidationErrors,
 ];
@@ -197,7 +211,7 @@ router.get("/:groupId", async (req, res) => {
     });
   }
 
-  const allMembers = await Membership.findAll({
+  const allMembers = await Membership.count({
     where: { groupId: req.params.groupId },
   });
   const everyImage = await GroupImage.findAll({
@@ -279,9 +293,7 @@ router.put("/:groupId", [requireAuth, validateGroup], async (req, res) => {
   } else editGroup.state;
 
   await editGroup.save();
-  res.json({
-    editGroup,
-  });
+  res.json(editGroup);
 });
 
 // 12. delete group

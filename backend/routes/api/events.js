@@ -20,7 +20,7 @@ const validateEvent = [
   check("name")
     .exists({ checkFalsy: true })
     .isLength({ max: 60 })
-    .withMessage("Name must be 60 characters or less."),
+    .withMessage("Name must be at least 5 characters."),
   check("type")
     .exists({ checkFalsy: true })
     .isIn(["Online", "In person"])
@@ -32,6 +32,13 @@ const validateEvent = [
   check("price")
     .exists({ checkFalsy: true })
     .isFloat()
+    .custom((value) => {
+      value = value.toFixed(2);
+      if (value.toString().split(".")[1].length > 2) {
+        throw new Error("Price is invalid");
+      }
+      return true;
+    })
     .withMessage("Price is invalid"),
   check("description")
     .exists({ checkFalsy: true })
@@ -39,15 +46,65 @@ const validateEvent = [
     .withMessage("Description is required"),
   check("startDate")
     .exists({ checkFalsy: true })
+    .isISO8601()
+    .isAfter(new Date().toLocaleString())
     .withMessage("Start date must be in the future"),
   check("endDate")
     .exists({ checkFalsy: true })
+    .isISO8601()
+    .isAfter(new Date().toLocaleString())
+    .custom((value, { req }) => {
+      const startDate = new Date(req.body.startDate);
+      const endDate = new Date(value);
+      if (endDate <= startDate) {
+        throw new Error("End date is less than start date");
+      } else return true;
+    })
     .withMessage("End date is less than start date"),
   handleValidationErrors,
 ];
 
+const validatePagination = [
+  check("page")
+    .optional()
+    .custom((value) => {
+      if (value < 1) {
+        throw new Error("Page must be greater than or equal to 1");
+      }
+      return value;
+    }),
+  check("size")
+    .optional()
+    .custom((value) => {
+      if (value < 1) throw new Error("Size must be greater than or equal to 1");
+      return value;
+    }),
+  check("name")
+    .optional()
+    .custom((value) => {
+      if (typeof value !== "string") throw new Error("Name must be a string");
+      return true;
+    })
+    .withMessage("Name must be a string"),
+  check("type")
+    .optional()
+    .custom((value) => {
+      if (value.includes("Online") || value.includes("In person")) return true;
+    })
+    .withMessage("Type must be 'Online' or 'In person'"),
+  check("startDate")
+    .optional()
+    .isISO8601({
+      options: {
+        format: "YYYY/MM/DD h:m:s",
+      },
+    })
+    .withMessage("Start date must be a valid datetime"),
+  handleValidationErrors,
+];
+
 // 16. get all events
-router.get("/", async (req, res) => {
+router.get("/", validatePagination, async (req, res) => {
   // 33. add query filters to get all events
   let { page, size, name, type, startDate } = req.query;
   if (page) page = parseInt(page);
@@ -129,6 +186,7 @@ router.get("/:eventId", async (req, res) => {
       "groupId",
       "venueId",
       "name",
+      "description",
       "type",
       "capacity",
       "price",
@@ -143,7 +201,7 @@ router.get("/:eventId", async (req, res) => {
     });
   }
 
-  const numAttending = await Attendance.findAll({
+  const numAttending = await Attendance.count({
     where: { eventId: req.params.eventId },
   });
   const everyImage = await EventImage.findOne({
@@ -164,7 +222,7 @@ router.get("/:eventId", async (req, res) => {
     results.Venue = getGroupsAndVenues.Venue;
   }
   if (everyImage) {
-    results.everyImage = everyImage;
+    results.EventImages = everyImage;
   }
 
   res.json(results);
