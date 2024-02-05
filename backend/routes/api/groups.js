@@ -67,7 +67,7 @@ const validateVenue = [
 const validateEvent = [
   check("name")
     .exists({ checkFalsy: true })
-    .isLength({ max: 60 })
+    .isLength({ min: 5 })
     .withMessage("Name must be at least 5 characters."),
   check("type")
     .exists({ checkFalsy: true })
@@ -653,10 +653,10 @@ router.put("/:groupId/membership", requireAuth, async (req, res) => {
       (editMember && editMember.status === "co-host") ||
       user.id === getGroupById.organizerId
     ) {
-      if (status) changeMember.status = status;
-      else changeMember.status;
-      await changeMember.save();
-      res.json(changeMember);
+      if (status) getMemberById.status = status;
+      else getMemberById.status;
+      await getMemberById.save();
+      res.json(getMemberById);
     } else {
       return res.status(403).json({
         message: "forbidden",
@@ -665,10 +665,10 @@ router.put("/:groupId/membership", requireAuth, async (req, res) => {
   }
   if (status && status === "co-host") {
     if (user.id === getGroupById.organizerId) {
-      if (status) changeMember.status = status;
-      else changeMember.status;
-      await changeMember.save();
-      res.json(changeMember);
+      if (status) getMemberById.status = status;
+      else getMemberById.status;
+      await getMemberById.save();
+      res.json(getMemberById);
     } else {
       return res.status(403).json({
         message: "forbidden",

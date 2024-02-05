@@ -19,7 +19,7 @@ const router = express.Router();
 const validateEvent = [
   check("name")
     .exists({ checkFalsy: true })
-    .isLength({ max: 60 })
+    .isLength({ min: 5 })
     .withMessage("Name must be at least 5 characters."),
   check("type")
     .exists({ checkFalsy: true })
