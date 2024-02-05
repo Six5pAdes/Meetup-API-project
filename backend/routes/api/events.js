@@ -347,17 +347,32 @@ router.post("/:eventId/images", requireAuth, async (req, res) => {
       message: "Event couldn't be found",
     });
   }
-  if (findEvent.organizerId !== user.id) {
+  const findAttendant = await Attendance.findOne({
+    where: { userId: user.id, eventId: findEvent.id },
+  });
+  const findMember = await Membership.findOne({
+    where: { userId: user.id, groupId: findEvent.groupId },
+  });
+  const findGroup = await Group.findOne({
+    where: { organizerId: user.id },
+  });
+
+  if (
+    (findAttendant && findAttendant.status === "attendant") ||
+    (findAttendant && findAttendant.status === "waitlist") ||
+    (findMember && findMember === "co-host") ||
+    (findGroup && findGroup.organizerId === user.id)
+  ) {
+    const newEventImage = await EventImage.create({
+      url,
+      preview,
+    });
+    res.json(newEventImage);
+  } else {
     res.status(403).json({
       message: "forbidden",
     });
   }
-
-  const newEventImage = await findEvent.createEventImage({
-    url,
-    preview,
-  });
-  res.json(newEventImage);
 });
 
 // <----------------------------------------------------->
