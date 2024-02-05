@@ -1,6 +1,6 @@
 const express = require("express");
 const { requireAuth } = require("../../utils/auth");
-const { EventImage, Event, Membership } = require("../../db/models");
+const { EventImage, Event, Membership, Group } = require("../../db/models");
 
 const router = express.Router();
 
@@ -22,10 +22,13 @@ router.delete("/:imageId", requireAuth, async (req, res) => {
   const member = await Membership.findOne({
     where: { userId: user.id, groupId: parentEvent.Event.id },
   });
+  const findOrganizer = await Group.findOne({
+    where: { id: parentEvent.Event.groupId },
+  });
 
   if (
     (member && member.status === "co-host") ||
-    parentEvent.Event.organizerId === user.id
+    (findOrganizer && findOrganizer.organizerId === user.id)
   ) {
     await destroyEventImg.destroy();
     res.json({
